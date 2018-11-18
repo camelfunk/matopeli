@@ -15,10 +15,13 @@ int main()
 			cout << "Peli suljetaan" << endl;
 			return 0;
 		case 1:
+			cout << "\nValittu yksinpeli" << endl;
 			break; // break poistuu switch-lauseesta seuraavaan
-		case 2: cout << "\nValittu erotus ";
+		case 2: cout << "\nValittu monipeli " << endl;
 			break;
-		case 3: cout << "\nValittu tulo ";
+		case 3: cout << "\nValittu ennätykset " << endl;
+			break;
+		case 4: cout << "\nValittu Asetukset" << endl;
 			break;
 		default: cout << "\nVirhe: ei ko. toimintoa!"; // jos syotetty arvo ei vastaa yhtakaan numeroa valilla 0-3, tulostuu tama
 		}
@@ -34,6 +37,7 @@ int KysyValinta(void) {
 	cout << "1. Aloita yksinpeli" << endl;
 	cout << "2. Aloita moninpeli" << endl;
 	cout << "3. Tarkasta enn„tykset" << endl;
+	cout << "4. Asetukset" << endl;
 	cin >> valinta;
 	return valinta;
 }
