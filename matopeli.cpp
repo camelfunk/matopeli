@@ -5,7 +5,7 @@ using namespace std;
 void KysyValinta();
 void AloitaPeli(int);
 void LuoKartta();
-void Syoto();
+void Syotto();
 void Liiku();
 void LopetaPeli();
 void ShowConsoleCursor(bool showFlag);
@@ -14,11 +14,11 @@ void ShowConsoleCursor(bool showFlag);
 const int leveys = 20; // x
 const int korkeus = 20; // y
 
-// omenan ilmestyy satunnaiseen paikkaan
+// omena ilmestyy satunnaiseen paikkaan
 int omena_x = rand() % 20;
-int omena_y = rand() % 10;
+int omena_y = rand() % 20;
 
-// mato alussa ilmestyy ruudun keskellä
+// mato alussa ilmestyy ruudun keskelle
 int mato_x = leveys / 2;
 int mato_y = korkeus / 2;
 
@@ -74,7 +74,7 @@ void AloitaPeli(int pelaajia) {
 	while (true)
 	{
 		LuoKartta();
-		Syoto();
+		Syotto();
 		Liiku();
 		Sleep(30);
 	}
@@ -118,7 +118,7 @@ void LuoKartta() {
 		
 }
 
-void Syoto() {
+void Syotto() {
 	if (_kbhit()) {
 		switch (_getch())
 		{
@@ -159,7 +159,7 @@ void Liiku() {
 	if (mato_x == omena_x && mato_y == omena_y) {
 		pisteet++;
 		omena_x = rand() % 20;
-		omena_y = rand() % 10;
+		omena_y = rand() % 20;
 	}
 }
 
@@ -173,7 +173,7 @@ void LopetaPeli() {
 	KysyValinta();
 }
 
-void ShowConsoleCursor(bool showFlag) //ettei kursori vilkuisi näytöllä
+void ShowConsoleCursor(bool showFlag) //ettei kursori vilkkuisi näytöllä
 	{
 		HANDLE out = GetStdHandle(STD_OUTPUT_HANDLE);
 
