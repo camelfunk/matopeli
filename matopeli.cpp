@@ -22,6 +22,11 @@ int omena_y = rand() % 20;
 int mato_x = leveys / 2;
 int mato_y = korkeus / 2;
 
+// hännän koordinaatit
+int hanta_x[100], hanta_y[100];
+int hanta_pituus;
+
+// liikuminen
 enum SUUNTA { ALKU = 0, OIKEALLE, ALAS, VASEMMALLE, YLOS };
 SUUNTA suunta;
 
@@ -85,19 +90,19 @@ void LuoKartta() {
 		system("cls"); // puhdistetaan näyttö
 
 		// piiretään ruutu
-		for (int i = 0; i < leveys; i++)
+		for (int i = 0; i <= leveys; i++)
 		{
-			cout << ".";	// ylärivi
+			cout << "-";	// ylärivi
 		}
 		cout << endl;
 
 		for (int i = 0; i < korkeus; i++)
 		{
-			for (int j = 0; j < leveys; j++)
+			for (int j = 0; j <= leveys; j++)
 			{
-				if (j == 0 || j == leveys -1)
+				if (j == 0 || j == leveys)
 				{
-					cout << ".";
+					cout << "I";
 				}
 				else if (i == mato_y && j == mato_x) {
 					cout << "O"; // piiretään mato
@@ -105,13 +110,28 @@ void LuoKartta() {
 				else if (i == omena_y && j == omena_x) {
 					cout << "x"; // piiretään omena
 				}
-				else cout << " ";
+				else {
+
+					bool print = false;
+					for (int k = 0; k < hanta_pituus; k++)
+					{
+						if (hanta_x[k] == j && hanta_y[k] == i)
+						{
+							cout << "o";
+							print = true;
+						}
+
+					}
+					if (!print)
+						cout << " ";
+				}
+				
 			}
 			cout << endl;
 		}
-		for (int i = 0; i < leveys; i++)
+		for (int i = 0; i <= leveys; i++)
 		{
-			cout << "."; // alarivi
+			cout << "-"; // alarivi
 		}
 		cout << endl << endl;
 		cout << "Pisteet: " << pisteet;
@@ -139,6 +159,24 @@ void Syotto() {
 }
 
 void Liiku() {
+
+	//hännän liikuminen
+	int prevX = hanta_x[0];
+	int prevY = hanta_y[0];
+	int prev2x, prev2y;
+	hanta_x[0] = mato_x;
+	hanta_y[0] = mato_y;
+
+	for (int i = 1; i < hanta_pituus; i++)
+	{
+		prev2x = hanta_x[i];
+		prev2y = hanta_y[i];
+		hanta_x[i] = prevX;
+		hanta_y[i] = prevY;
+		prevX = prev2x;
+		prevY = prev2y;
+	}
+
 	switch (suunta)
 	{
 	case YLOS:
@@ -154,12 +192,13 @@ void Liiku() {
 		mato_y++;
 		break;
 	}
-	if (mato_x > leveys || mato_x < 0 || mato_y > korkeus || mato_y < 0) // EI OLE TARKKAA!
+	if (mato_x > leveys || mato_x < 0 || mato_y > korkeus + 1 || mato_y < 0)
 		LopetaPeli();
 	if (mato_x == omena_x && mato_y == omena_y) {
 		pisteet++;
 		omena_x = rand() % 20;
 		omena_y = rand() % 20;
+		hanta_pituus++;
 	}
 }
 
@@ -170,6 +209,7 @@ void LopetaPeli() {
 	mato_x = leveys / 2;
 	mato_y = korkeus / 2;
 	suunta = ALKU;
+	hanta_pituus = 0;
 	KysyValinta();
 }
 
@@ -180,6 +220,6 @@ void ShowConsoleCursor(bool showFlag) //ettei kursori vilkkuisi näytöllä
 		CONSOLE_CURSOR_INFO     cursorInfo;
 
 		GetConsoleCursorInfo(out, &cursorInfo);
-		cursorInfo.bVisible = showFlag; // set the cursor visibility
+		cursorInfo.bVisible = showFlag; //kursori näkymättömäksi
 		SetConsoleCursorInfo(out, &cursorInfo);
 	}
