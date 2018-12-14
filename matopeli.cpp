@@ -3,7 +3,8 @@ using namespace std;
 #include <windows.h>
 #include <conio.h> 
 void KysyValinta();
-void AloitaPeli(int);
+void Asetukset();
+void AloitaPeli();
 void LuoKartta();
 void Syotto();
 void Liiku();
@@ -23,7 +24,8 @@ int mato_x = leveys / 2;
 int mato_y = korkeus / 2;
 
 // hännän koordinaatit
-int hanta_x[100], hanta_y[100];
+int hanta_x[100], hanta_y[100]; // hantax [10, 10, 9, 8 ,8]  Ooo
+								// hantay [ 2, 3, 2 , 2 ,3
 int hanta_pituus;
 
 // liikuminen
@@ -31,6 +33,11 @@ enum SUUNTA { ALKU = 0, OIKEALLE, ALAS, VASEMMALLE, YLOS };
 SUUNTA suunta;
 
 int pisteet = 0;
+
+bool seinat = false; //voiko käydä seinien läpi
+bool multiplayer = false;
+int pelaaja;
+int pisteet2;
 
 int main()
 {
@@ -49,8 +56,7 @@ void KysyValinta() {
 		cout << "0. Lopeta peli" << endl;
 		cout << "1. Aloita yksinpeli" << endl;
 		cout << "2. Aloita moninpeli" << endl;
-		cout << "3. Tarkasta enn„tykset" << endl;
-		cout << "4. Asetukset" << endl;
+		cout << "3. Asetukset" << endl;
 		cin >> valinta;
 		
 		switch (valinta) // valitsee casen valinnan saaman arvon mukaisesti
@@ -60,14 +66,16 @@ void KysyValinta() {
 			exit(0); //suljetaan peli
 		case 1:
 			cout << "\nValittu yksinpeli" << endl;
-			AloitaPeli(1); 
+			multiplayer = false;
+			AloitaPeli(); 
 			break; // break poistuu switch-lauseesta seuraavaan
-		case 2: cout << "\nValittu monipeli " << endl;
-			AloitaPeli(2);
+		case 2: cout << "\nValittu moninpeli " << endl;
+			multiplayer = true;
+			pelaaja = 1;
+			AloitaPeli();
 			break;
-		case 3: cout << "\nValittu ennätykset " << endl;
-			break;
-		case 4: cout << "\nValittu Asetukset" << endl;
+		case 3: cout << "\nValittu Asetukset" << endl;
+			Asetukset();
 			break;
 		default: cout << "\nVirhe: ei ko. toimintoa!"; // jos syotetty arvo ei vastaa yhtakaan numeroa valilla 0-3, tulostuu tama
 		}
@@ -75,7 +83,29 @@ void KysyValinta() {
 
 }
 
-void AloitaPeli(int pelaajia) {
+void Asetukset() {
+	system("cls");
+	int valinta;
+	cout << "ASETUKSET" << endl;
+	cout << "1. Pelaa seinien kanssa" << endl;
+	cout << "2. Pelaa ilman seiniä" << endl;
+	cin >> valinta;
+
+	switch (valinta)
+	{
+	case 1:
+		seinat = true;
+		KysyValinta();
+		break;
+	case 2: 
+		seinat = false;
+		KysyValinta();
+		break;
+	default: KysyValinta();
+	}
+}
+
+void AloitaPeli() {
 	while (true)
 	{
 		LuoKartta();
@@ -89,7 +119,7 @@ void AloitaPeli(int pelaajia) {
 void LuoKartta() {
 		system("cls"); // puhdistetaan näyttö
 
-		// piiretään ruutu
+		// piirretään ruutu
 		for (int i = 0; i <= leveys; i++)
 		{
 			cout << "-";	// ylärivi
@@ -105,25 +135,25 @@ void LuoKartta() {
 					cout << "I";
 				}
 				else if (i == mato_y && j == mato_x) {
-					cout << "O"; // piiretään mato
+					cout << "O"; // piirretään madon pää
 				}
 				else if (i == omena_y && j == omena_x) {
-					cout << "x"; // piiretään omena
+					cout << "x"; // piirretään omena
 				}
 				else {
 
-					bool print = false;
+					bool onkoHanta = false;
 					for (int k = 0; k < hanta_pituus; k++)
 					{
 						if (hanta_x[k] == j && hanta_y[k] == i)
 						{
-							cout << "o";
-							print = true;
+							cout << "o"; // piirretään madon häntää
+							onkoHanta = true;
 						}
 
 					}
-					if (!print)
-						cout << " ";
+					if (!onkoHanta)
+						cout << " ";	// mikäli paikassa ei ole häntää, piirretään tyhjä väli
 				}
 				
 			}
@@ -154,27 +184,31 @@ void Syotto() {
 		case 's':
 			suunta = ALAS;
 			break;
+		case 'q':
+			LopetaPeli();
+			break;
 		}
 	}
 }
 
 void Liiku() {
-
+															
 	//hännän liikuminen
-	int prevX = hanta_x[0];
-	int prevY = hanta_y[0];
-	int prev2x, prev2y;
-	hanta_x[0] = mato_x;
+	int seuraava_x = hanta_x[0];	
+	int seuraava_y = hanta_y[0];	
+	hanta_x[0] = mato_x;	// häntä siirtyy madon pään tilalle    Ooooo
 	hanta_y[0] = mato_y;
+	int temp_x, temp_y;
 
+	// siiretään koordinati-taulukkojen alkiot yksi taaksepäin
 	for (int i = 1; i < hanta_pituus; i++)
 	{
-		prev2x = hanta_x[i];
-		prev2y = hanta_y[i];
-		hanta_x[i] = prevX;
-		hanta_y[i] = prevY;
-		prevX = prev2x;
-		prevY = prev2y;
+		temp_x = hanta_x[i];	
+		temp_y = hanta_y[i];	
+		hanta_x[i] = seuraava_x; 
+		hanta_y[i] = seuraava_y; 
+		seuraava_x = temp_x;	
+		seuraava_y = temp_y;
 	}
 
 	switch (suunta)
@@ -192,9 +226,21 @@ void Liiku() {
 		mato_y++;
 		break;
 	}
-	if (mato_x > leveys || mato_x < 0 || mato_y > korkeus + 1 || mato_y < 0)
-		LopetaPeli();
-	if (mato_x == omena_x && mato_y == omena_y) {
+	if (mato_x >= leveys || mato_x <= 0 || mato_y >= korkeus || mato_y < 0) { // kun törmätään seinään
+		if (seinat) LopetaPeli();
+		else if (mato_x >= leveys) mato_x = 0;
+		else if (mato_x <= 0) mato_x = leveys - 1;
+		else if (mato_y >= korkeus) mato_y = 0;
+		else if (mato_y < 0) mato_y = korkeus - 1;
+	}
+
+	for (int i = 0; i < hanta_pituus; i++) // tai kun tormätään häntään
+	{
+		if (hanta_x[i] == mato_x && hanta_y[i] == mato_y)
+			LopetaPeli();
+	} 
+
+	if (mato_x == omena_x && mato_y == omena_y) {	// kun omena on syöty
 		pisteet++;
 		omena_x = rand() % 20;
 		omena_y = rand() % 20;
@@ -204,12 +250,34 @@ void Liiku() {
 
 void LopetaPeli() {
 	system("cls");
-	cout << "GAME OVER" << endl << endl;
-	cout << "Sait " << pisteet << " pistettä!" << endl << endl;
-	mato_x = leveys / 2;
+	mato_x = leveys / 2;	//Asetetaan kaikki takaisin alkuun
 	mato_y = korkeus / 2;
 	suunta = ALKU;
 	hanta_pituus = 0;
+	if (multiplayer) {
+		switch (pelaaja)
+		{
+		case 1: pisteet2 = pisteet;
+			pelaaja++;
+			pisteet = 0;
+			AloitaPeli();
+			break;
+		case 2:
+			if (pisteet2 > pisteet) cout << "Ensimmäinen pelaaja voitti." << endl << endl;
+			else if (pisteet2 < pisteet) cout << "Toinen pelaaja voitti" << endl << endl;
+			else cout << "Tasapeli!" << endl << endl;
+			pelaaja = 0;
+			pisteet = 0;
+			KysyValinta();
+			break;
+		default:
+			break;
+		}
+	}
+	
+	cout << "GAME OVER" << endl << endl;
+	cout << "Sait " << pisteet << " pistettä!" << endl << endl;
+	pisteet = 0;
 	KysyValinta();
 }
 
